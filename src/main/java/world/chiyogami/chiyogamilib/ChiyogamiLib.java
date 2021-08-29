@@ -40,7 +40,7 @@ public final class ChiyogamiLib{
     public void smoothTeleport(Player player, Location location, PlayerTeleportEvent.TeleportCause cause){
         location = location.clone();
         Location finalLocation = location;
-        new WorldThreadRunnable(finalLocation.getWorld()){
+        new BukkitRunnable(){
             @Override
             public void run() {
                 World world = finalLocation.getWorld();
@@ -74,7 +74,7 @@ public final class ChiyogamiLib{
                     }.runTask(plugin);
                 });
             }
-        }.runTask();
+        }.runTask(plugin);
     }
     
     /**
@@ -96,7 +96,7 @@ public final class ChiyogamiLib{
      */
     public void smoothTeleport(Player player, Location location, long delay, PlayerTeleportEvent.TeleportCause cause){
         Location finalLoc = location.clone();
-        new WorldThreadRunnable(finalLoc.getWorld()){
+        new BukkitRunnable(){
             @Override
             public void run() {
                 final boolean[] teleported = {false};
@@ -123,6 +123,6 @@ public final class ChiyogamiLib{
                     }
                 }.runTask(plugin);
             }
-        }.runTask();
+        }.runTask(plugin);
     }
 }
