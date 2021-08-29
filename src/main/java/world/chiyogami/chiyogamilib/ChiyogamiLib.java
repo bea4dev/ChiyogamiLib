@@ -1,20 +1,32 @@
 package world.chiyogami.chiyogamilib;
 
+import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.plugin.Plugin;
+import world.chiyogami.chiyogamilib.scheduler.WorldThreadRunnable;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 public final class ChiyogamiLib{
+    
+    private final Plugin plugin;
+    
+    public ChiyogamiLib(Plugin plugin){
+        this.plugin = plugin;
+    }
     
     /**
      * Load the chunk to be teleported to first to ensure smooth teleportation.
      * @param player Player to teleport
      * @param location Location to teleport to
      */
-    public static void smoothTeleport(Player player, Location location){
+    public void smoothTeleport(Player player, Location location){
         smoothTeleport(player, location, PlayerTeleportEvent.TeleportCause.PLUGIN);
     }
     
@@ -24,16 +36,44 @@ public final class ChiyogamiLib{
      * @param location Location to teleport to
      * @param cause Reason for teleport
      */
-    public static void smoothTeleport(Player player, Location location, PlayerTeleportEvent.TeleportCause cause){
-        try {
-            Method method = Player.class.getMethod("teleportSmooth", Location.class, PlayerTeleportEvent.TeleportCause.class);
-            method.invoke(player, location, cause);
-        } catch (NoSuchMethodException e) {
-            //e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        //player.teleportSmooth(location, cause);
+    public void smoothTeleport(Player player, Location location, PlayerTeleportEvent.TeleportCause cause){
+        location = location.clone();
+        Location finalLocation = location;
+        new WorldThreadRunnable(finalLocation.getWorld()){
+            @Override
+            public void run() {
+                World world = finalLocation.getWorld();
+                Set<CompletableFuture<Chunk>> completableFutures = new HashSet<>();
+                Set<Chunk> chunks = new HashSet<>();
+            
+                int range = Bukkit.getServer().getViewDistance();
+                for(int x = -range; x < range; x++){
+                    for(int z = -range; z < range; z++){
+                        CompletableFuture<Chunk> completable = world.getChunkAtAsync((finalLocation.getBlockX() >> 4) + x, (finalLocation.getBlockZ() >> 4) + z);
+                        completable.thenAccept(chunk -> {
+                            chunk.setForceLoaded(true);
+                            chunks.add(chunk);
+                        });
+                        completableFutures.add(completable);
+                    }
+                }
+            
+                CompletableFuture<Void> allChunkLoad = CompletableFuture.supplyAsync(() -> {
+                    completableFutures.forEach(CompletableFuture::join);
+                    return null;
+                });
+            
+                allChunkLoad.thenAccept(v -> {
+                    new WorldThreadRunnable(finalLocation.getWorld()) {
+                        @Override
+                        public void run() {
+                            player.teleport(finalLocation, cause);
+                            chunks.forEach(chunk -> chunk.setForceLoaded(false));
+                        }
+                    }.runTask();
+                });
+            }
+        }.runTask();
     }
     
     /**
@@ -42,7 +82,7 @@ public final class ChiyogamiLib{
      * @param location Location to teleport to
      * @param delay tick delay
      */
-    public static void smoothTeleport(Player player, Location location, long delay){
+    public void smoothTeleport(Player player, Location location, long delay){
         smoothTeleport(player, location, delay, PlayerTeleportEvent.TeleportCause.PLUGIN);
     }
     
@@ -53,15 +93,35 @@ public final class ChiyogamiLib{
      * @param delay tick delay
      * @param cause Reason for teleport
      */
-    public static void smoothTeleport(Player player, Location location, long delay, PlayerTeleportEvent.TeleportCause cause){
-        try {
-            Method method = Player.class.getMethod("teleportSmooth", Location.class, long.class, PlayerTeleportEvent.TeleportCause.class);
-            method.invoke(player, location, delay, cause);
-        } catch (NoSuchMethodException e) {
-            //e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        //player.teleportSmooth(location, delay, cause);
+    public void smoothTeleport(Player player, Location location, long delay, PlayerTeleportEvent.TeleportCause cause){
+        Location finalLoc = location.clone();
+        new WorldThreadRunnable(finalLoc.getWorld()){
+            @Override
+            public void run() {
+                final boolean[] teleported = {false};
+                World world = finalLoc.getWorld();
+                Set<Chunk> chunks = new HashSet<>();
+            
+                int range = Bukkit.getServer().getViewDistance();
+                for(int x = -range; x < range; x++){
+                    for(int z = -range; z < range; z++){
+                        CompletableFuture<Chunk> completable = world.getChunkAtAsync((finalLoc.getBlockX() >> 4) + x, (finalLoc.getBlockZ() >> 4) + z);
+                        completable.thenAccept(chunk -> {
+                            if(!teleported[0]) chunk.setForceLoaded(true);
+                            chunks.add(chunk);
+                        });
+                    }
+                }
+            
+                new WorldThreadRunnable(finalLoc.getWorld()) {
+                    @Override
+                    public void run() {
+                        player.teleport(finalLoc, cause);
+                        teleported[0] = true;
+                        chunks.forEach(chunk -> chunk.setForceLoaded(false));
+                    }
+                }.runTaskLater(delay);
+            }
+        }.runTask();
     }
 }
