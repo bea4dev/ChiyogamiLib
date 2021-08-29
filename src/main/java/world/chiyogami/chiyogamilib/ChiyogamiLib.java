@@ -4,6 +4,9 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 public final class ChiyogamiLib{
     
     /**
@@ -22,7 +25,15 @@ public final class ChiyogamiLib{
      * @param cause Reason for teleport
      */
     public static void smoothTeleport(Player player, Location location, PlayerTeleportEvent.TeleportCause cause){
-        player.teleportSmooth(location, cause);
+        try {
+            Method method = Player.class.getMethod("teleportSmooth", Location.class, PlayerTeleportEvent.TeleportCause.class);
+            method.invoke(player, location, cause);
+        } catch (NoSuchMethodException e) {
+            //e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        //player.teleportSmooth(location, cause);
     }
     
     /**
@@ -43,6 +54,14 @@ public final class ChiyogamiLib{
      * @param cause Reason for teleport
      */
     public static void smoothTeleport(Player player, Location location, long delay, PlayerTeleportEvent.TeleportCause cause){
-        player.teleportSmooth(location, delay, cause);
+        try {
+            Method method = Player.class.getMethod("teleportSmooth", Location.class, long.class, PlayerTeleportEvent.TeleportCause.class);
+            method.invoke(player, location, delay, cause);
+        } catch (NoSuchMethodException e) {
+            //e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        //player.teleportSmooth(location, delay, cause);
     }
 }
