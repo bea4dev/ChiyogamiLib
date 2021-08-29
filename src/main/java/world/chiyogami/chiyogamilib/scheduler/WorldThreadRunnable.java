@@ -103,7 +103,7 @@ public abstract class WorldThreadRunnable implements Runnable{
     
     
     private void checkNotYetScheduled() {
-        if (taskID == -1) {
+        if (taskID != -1) {
             throw new IllegalStateException("Already scheduled as " + taskID);
         }
     }
