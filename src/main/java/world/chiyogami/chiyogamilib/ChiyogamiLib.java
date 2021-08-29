@@ -7,6 +7,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitRunnable;
 import world.chiyogami.chiyogamilib.scheduler.WorldThreadRunnable;
 
 import java.util.HashSet;
@@ -64,13 +65,13 @@ public final class ChiyogamiLib{
                 });
             
                 allChunkLoad.thenAccept(v -> {
-                    new WorldThreadRunnable(finalLocation.getWorld()) {
+                    new BukkitRunnable() {
                         @Override
                         public void run() {
                             player.teleport(finalLocation, cause);
                             chunks.forEach(chunk -> chunk.setForceLoaded(false));
                         }
-                    }.runTask();
+                    }.runTask(plugin);
                 });
             }
         }.runTask();
@@ -112,15 +113,15 @@ public final class ChiyogamiLib{
                         });
                     }
                 }
-            
-                new WorldThreadRunnable(finalLoc.getWorld()) {
+                
+                new BukkitRunnable() {
                     @Override
                     public void run() {
                         player.teleport(finalLoc, cause);
                         teleported[0] = true;
                         chunks.forEach(chunk -> chunk.setForceLoaded(false));
                     }
-                }.runTaskLater(delay);
+                }.runTask(plugin);
             }
         }.runTask();
     }
