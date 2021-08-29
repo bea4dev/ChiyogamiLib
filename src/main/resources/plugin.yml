@@ -1,0 +1,4 @@
+name: ChiyogamiLib
+version: ${project.version}
+main: world.chiyogami.chiyogamilib.ChiyogamiLib
+api-version: 1.15
