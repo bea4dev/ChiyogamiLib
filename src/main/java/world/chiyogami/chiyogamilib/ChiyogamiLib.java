@@ -6,8 +6,6 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitRunnable;
 import world.chiyogami.chiyogamilib.scheduler.WorldThreadRunnable;
 
 import java.util.HashSet;
@@ -16,11 +14,7 @@ import java.util.concurrent.CompletableFuture;
 
 public final class ChiyogamiLib{
     
-    private final Plugin plugin;
-    
-    public ChiyogamiLib(Plugin plugin){
-        this.plugin = plugin;
-    }
+    private ChiyogamiLib(){}
     
     /**
      * Load the chunk to be teleported to first to ensure smooth teleportation.
@@ -38,9 +32,8 @@ public final class ChiyogamiLib{
      * @param cause Reason for teleport
      */
     public void smoothTeleport(Player player, Location location, PlayerTeleportEvent.TeleportCause cause){
-        location = location.clone();
-        Location finalLocation = location;
-        new BukkitRunnable(){
+        Location finalLocation = location.clone();
+        new WorldThreadRunnable(finalLocation.getWorld()){
             @Override
             public void run() {
                 World world = finalLocation.getWorld();
@@ -65,16 +58,16 @@ public final class ChiyogamiLib{
                 });
             
                 allChunkLoad.thenAccept(v -> {
-                    new BukkitRunnable() {
+                    new WorldThreadRunnable(finalLocation.getWorld()) {
                         @Override
                         public void run() {
                             player.teleport(finalLocation, cause);
                             chunks.forEach(chunk -> chunk.setForceLoaded(false));
                         }
-                    }.runTask(plugin);
+                    }.runTask();
                 });
             }
-        }.runTask(plugin);
+        }.runTask();
     }
     
     /**
@@ -96,7 +89,7 @@ public final class ChiyogamiLib{
      */
     public void smoothTeleport(Player player, Location location, long delay, PlayerTeleportEvent.TeleportCause cause){
         Location finalLoc = location.clone();
-        new BukkitRunnable(){
+        new WorldThreadRunnable(finalLoc.getWorld()){
             @Override
             public void run() {
                 final boolean[] teleported = {false};
@@ -114,15 +107,15 @@ public final class ChiyogamiLib{
                     }
                 }
                 
-                new BukkitRunnable() {
+                new WorldThreadRunnable(finalLoc.getWorld()) {
                     @Override
                     public void run() {
                         player.teleport(finalLoc, cause);
                         teleported[0] = true;
                         chunks.forEach(chunk -> chunk.setForceLoaded(false));
                     }
-                }.runTask(plugin);
+                }.runTask();
             }
-        }.runTask(plugin);
+        }.runTask();
     }
 }
