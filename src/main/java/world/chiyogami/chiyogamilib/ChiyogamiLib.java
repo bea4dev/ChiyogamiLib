@@ -21,7 +21,7 @@ public final class ChiyogamiLib{
      * @param player Player to teleport
      * @param location Location to teleport to
      */
-    public void smoothTeleport(Player player, Location location){
+    public static void smoothTeleport(Player player, Location location){
         smoothTeleport(player, location, PlayerTeleportEvent.TeleportCause.PLUGIN);
     }
     
@@ -31,7 +31,7 @@ public final class ChiyogamiLib{
      * @param location Location to teleport to
      * @param cause Reason for teleport
      */
-    public void smoothTeleport(Player player, Location location, PlayerTeleportEvent.TeleportCause cause){
+    public static void smoothTeleport(Player player, Location location, PlayerTeleportEvent.TeleportCause cause){
         Location finalLocation = location.clone();
         new WorldThreadRunnable(finalLocation.getWorld()){
             @Override
@@ -76,7 +76,7 @@ public final class ChiyogamiLib{
      * @param location Location to teleport to
      * @param delay tick delay
      */
-    public void smoothTeleport(Player player, Location location, long delay){
+    public static void smoothTeleport(Player player, Location location, long delay){
         smoothTeleport(player, location, delay, PlayerTeleportEvent.TeleportCause.PLUGIN);
     }
     
@@ -87,7 +87,7 @@ public final class ChiyogamiLib{
      * @param delay tick delay
      * @param cause Reason for teleport
      */
-    public void smoothTeleport(Player player, Location location, long delay, PlayerTeleportEvent.TeleportCause cause){
+    public static void smoothTeleport(Player player, Location location, long delay, PlayerTeleportEvent.TeleportCause cause){
         Location finalLoc = location.clone();
         new WorldThreadRunnable(finalLoc.getWorld()){
             @Override
