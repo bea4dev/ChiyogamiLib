@@ -39,9 +39,10 @@ public final class ChiyogamiLib{
      * Load the chunk to be teleported to first to ensure smooth teleportation.
      * @param player Player to teleport
      * @param location Location to teleport to
+     * @return CompletableFuture<Void> that completes.
      */
-    public void smoothTeleport(Player player, Location location){
-        smoothTeleport(player, location, PlayerTeleportEvent.TeleportCause.PLUGIN);
+    public CompletableFuture<Void> smoothTeleport(Player player, Location location){
+        return smoothTeleport(player, location, PlayerTeleportEvent.TeleportCause.PLUGIN);
     }
     
     /**
@@ -49,14 +50,16 @@ public final class ChiyogamiLib{
      * @param player Player to teleport
      * @param location Location to teleport to
      * @param cause Reason for teleport
+     * @return CompletableFuture<Void> that completes.
      */
-    public void smoothTeleport(Player player, Location location, PlayerTeleportEvent.TeleportCause cause){
+    public CompletableFuture<Void> smoothTeleport(Player player, Location location, PlayerTeleportEvent.TeleportCause cause){
         
         if(serverType == ServerType.CRAFT_BUKKIT){
             player.teleport(location);
-            return;
+            return CompletableFuture.completedFuture(null);
         }
         
+        CompletableFuture<Void> completableFuture = new CompletableFuture<>();
         Location finalLocation = location.clone();
         new WorldThreadRunnable(finalLocation.getWorld()){
             @Override
@@ -88,11 +91,14 @@ public final class ChiyogamiLib{
                         public void run() {
                             player.teleport(finalLocation, cause);
                             chunks.forEach(chunk -> chunk.setForceLoaded(false));
+                            completableFuture.complete(null);
                         }
                     }.runTask(plugin);
                 });
             }
         }.runTask(plugin);
+        
+        return completableFuture;
     }
     
     /**
@@ -118,7 +124,7 @@ public final class ChiyogamiLib{
             player.teleport(location);
             return;
         }
-    
+        
         Location finalLoc = location.clone();
         new WorldThreadRunnable(finalLoc.getWorld()){
             @Override
