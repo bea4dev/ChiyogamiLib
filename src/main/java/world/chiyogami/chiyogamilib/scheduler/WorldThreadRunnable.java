@@ -66,7 +66,7 @@ public abstract class WorldThreadRunnable implements Runnable{
     }
     
     private static void registerDelayRunnable(WorldThreadRunnable worldThreadRunnable, long delay){
-        Set<WorldThreadRunnable> delayRunnableSet = delayMap.computeIfAbsent(delay, k -> ConcurrentHashMap.newKeySet());
+        Set<WorldThreadRunnable> delayRunnableSet = delayMap.computeIfAbsent(currentTick + delay, k -> ConcurrentHashMap.newKeySet());
         delayRunnableSet.add(worldThreadRunnable);
     }
     
