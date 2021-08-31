@@ -44,7 +44,7 @@ public abstract class WorldThreadRunnable implements Runnable{
         if(tickRunnableSet != null){
             tickRunnableSet.forEach(runnable -> {
                 try {
-                    runnable.run();
+                    if(currentTick % runnable.tick == 0) runnable.run();
                 }catch (Exception e){e.printStackTrace();}
                 if(runnable.isCancelled) {
                     tickRunnableSet.remove(runnable);
