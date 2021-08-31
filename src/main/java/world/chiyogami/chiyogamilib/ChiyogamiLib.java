@@ -6,6 +6,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import world.chiyogami.chiyogamilib.scheduler.ChiyogamiLibDummyPlugin;
 import world.chiyogami.chiyogamilib.scheduler.WorldThreadRunnable;
 
 import java.util.HashSet;
@@ -13,6 +14,28 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 public final class ChiyogamiLib{
+    
+    private static final ServerType serverType;
+    private static final ChiyogamiLibDummyPlugin dummyPlugin;
+    
+    static {
+        serverType = ServerType.getTypeByName(Bukkit.getName());
+        dummyPlugin = new ChiyogamiLibDummyPlugin();
+    }
+    
+    /**
+     * Get server type.
+     * @return ServerType(CRAFT_BUKKIT, PAPER, CHIYOGAMI)
+     */
+    public static ServerType getServerType() {return serverType;}
+    
+    /**
+     * Get dummy plugin.
+     * @return JavaPlugin
+     */
+    public static ChiyogamiLibDummyPlugin getDummyPlugin() {
+        return dummyPlugin;
+    }
     
     private ChiyogamiLib(){}
     
@@ -32,6 +55,12 @@ public final class ChiyogamiLib{
      * @param cause Reason for teleport
      */
     public static void smoothTeleport(Player player, Location location, PlayerTeleportEvent.TeleportCause cause){
+        
+        if(serverType == ServerType.CRAFT_BUKKIT){
+            player.teleport(location);
+            return;
+        }
+        
         Location finalLocation = location.clone();
         new WorldThreadRunnable(finalLocation.getWorld()){
             @Override
@@ -88,6 +117,12 @@ public final class ChiyogamiLib{
      * @param cause Reason for teleport
      */
     public static void smoothTeleport(Player player, Location location, long delay, PlayerTeleportEvent.TeleportCause cause){
+    
+        if(serverType == ServerType.CRAFT_BUKKIT){
+            player.teleport(location);
+            return;
+        }
+    
         Location finalLoc = location.clone();
         new WorldThreadRunnable(finalLoc.getWorld()){
             @Override
@@ -114,7 +149,7 @@ public final class ChiyogamiLib{
                         teleported[0] = true;
                         chunks.forEach(chunk -> chunk.setForceLoaded(false));
                     }
-                }.runTask();
+                }.runTaskLater(delay);
             }
         }.runTask();
     }

@@ -1,6 +1,9 @@
 package world.chiyogami.chiyogamilib.scheduler;
 
 import org.bukkit.World;
+import org.bukkit.scheduler.BukkitRunnable;
+import world.chiyogami.chiyogamilib.ChiyogamiLib;
+import world.chiyogami.chiyogamilib.ServerType;
 
 import java.util.Map;
 import java.util.Set;
@@ -28,14 +31,20 @@ public abstract class WorldThreadRunnable implements Runnable{
         
         Set<WorldThreadRunnable> runnableSet = worldThreadRunnableMap.get(world);
         if(runnableSet != null){
-            runnableSet.forEach(Runnable::run);
+            runnableSet.forEach(runnable -> {
+                try {
+                    runnable.run();
+                }catch (Exception e){e.printStackTrace();}
+            });
             runnableSet.clear();
         }
         
         Set<WorldThreadRunnable> tickRunnableSet = worldThreadTickRunnableMap.get(world);
         if(tickRunnableSet != null){
             tickRunnableSet.forEach(runnable -> {
-                runnable.run();
+                try {
+                    runnable.run();
+                }catch (Exception e){e.printStackTrace();}
                 if(runnable.isCancelled) {
                     tickRunnableSet.remove(runnable);
                 }
@@ -74,18 +83,48 @@ public abstract class WorldThreadRunnable implements Runnable{
     
     
     public synchronized void runTask(){
+        if(ChiyogamiLib.getServerType() != ServerType.CHIYOGAMI){
+            new BukkitRunnable(){
+                @Override
+                public void run() {
+                    WorldThreadRunnable.this.run();
+                }
+            }.runTask(ChiyogamiLib.getDummyPlugin());
+            return;
+        }
+        
         checkNotYetScheduled();
         setupID();
         registerRunnable(this);
     }
     
     public synchronized void runTaskLater(long delay){
+        if(ChiyogamiLib.getServerType() != ServerType.CHIYOGAMI){
+            new BukkitRunnable(){
+                @Override
+                public void run() {
+                    WorldThreadRunnable.this.run();
+                }
+            }.runTaskLater(ChiyogamiLib.getDummyPlugin(), delay);
+            return;
+        }
+        
         checkNotYetScheduled();
         setupID();
         registerDelayRunnable(this, delay);
     }
     
     public synchronized void runTaskTimer(long delay, long period){
+        if(ChiyogamiLib.getServerType() != ServerType.CHIYOGAMI){
+            new BukkitRunnable(){
+                @Override
+                public void run() {
+                    WorldThreadRunnable.this.run();
+                }
+            }.runTaskTimer(ChiyogamiLib.getDummyPlugin(), delay, period);
+            return;
+        }
+        
         checkNotYetScheduled();
         setupID();
         tick = period;
