@@ -1,6 +1,7 @@
 package world.chiyogami.chiyogamilib.scheduler;
 
 import org.bukkit.World;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import world.chiyogami.chiyogamilib.ChiyogamiLib;
 import world.chiyogami.chiyogamilib.ServerType;
@@ -82,14 +83,14 @@ public abstract class WorldThreadRunnable implements Runnable{
     }
     
     
-    public synchronized void runTask(){
+    public synchronized void runTask(JavaPlugin plugin){
         if(ChiyogamiLib.getServerType() != ServerType.CHIYOGAMI){
             new BukkitRunnable(){
                 @Override
                 public void run() {
                     WorldThreadRunnable.this.run();
                 }
-            }.runTask(ChiyogamiLib.getDummyPlugin());
+            }.runTask(plugin);
             return;
         }
         
@@ -98,14 +99,14 @@ public abstract class WorldThreadRunnable implements Runnable{
         registerRunnable(this);
     }
     
-    public synchronized void runTaskLater(long delay){
+    public synchronized void runTaskLater(JavaPlugin plugin, long delay){
         if(ChiyogamiLib.getServerType() != ServerType.CHIYOGAMI){
             new BukkitRunnable(){
                 @Override
                 public void run() {
                     WorldThreadRunnable.this.run();
                 }
-            }.runTaskLater(ChiyogamiLib.getDummyPlugin(), delay);
+            }.runTaskLater(plugin, delay);
             return;
         }
         
@@ -114,14 +115,14 @@ public abstract class WorldThreadRunnable implements Runnable{
         registerDelayRunnable(this, delay);
     }
     
-    public synchronized void runTaskTimer(long delay, long period){
+    public synchronized void runTaskTimer(JavaPlugin plugin, long delay, long period){
         if(ChiyogamiLib.getServerType() != ServerType.CHIYOGAMI){
             new BukkitRunnable(){
                 @Override
                 public void run() {
                     WorldThreadRunnable.this.run();
                 }
-            }.runTaskTimer(ChiyogamiLib.getDummyPlugin(), delay, period);
+            }.runTaskTimer(plugin, delay, period);
             return;
         }
         

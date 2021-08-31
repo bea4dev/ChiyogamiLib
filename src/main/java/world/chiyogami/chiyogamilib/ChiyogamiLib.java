@@ -6,7 +6,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
-import world.chiyogami.chiyogamilib.scheduler.ChiyogamiLibDummyPlugin;
+import org.bukkit.plugin.java.JavaPlugin;
 import world.chiyogami.chiyogamilib.scheduler.WorldThreadRunnable;
 
 import java.util.HashSet;
@@ -16,11 +16,9 @@ import java.util.concurrent.CompletableFuture;
 public final class ChiyogamiLib{
     
     private static final ServerType serverType;
-    private static final ChiyogamiLibDummyPlugin dummyPlugin;
     
     static {
         serverType = ServerType.getTypeByName(Bukkit.getName());
-        dummyPlugin = new ChiyogamiLibDummyPlugin();
     }
     
     /**
@@ -29,22 +27,20 @@ public final class ChiyogamiLib{
      */
     public static ServerType getServerType() {return serverType;}
     
-    /**
-     * Get dummy plugin.
-     * @return JavaPlugin
-     */
-    public static ChiyogamiLibDummyPlugin getDummyPlugin() {
-        return dummyPlugin;
-    }
     
-    private ChiyogamiLib(){}
+    
+    private final JavaPlugin plugin;
+    
+    public ChiyogamiLib(JavaPlugin plugin){
+        this.plugin = plugin;
+    }
     
     /**
      * Load the chunk to be teleported to first to ensure smooth teleportation.
      * @param player Player to teleport
      * @param location Location to teleport to
      */
-    public static void smoothTeleport(Player player, Location location){
+    public void smoothTeleport(Player player, Location location){
         smoothTeleport(player, location, PlayerTeleportEvent.TeleportCause.PLUGIN);
     }
     
@@ -54,7 +50,7 @@ public final class ChiyogamiLib{
      * @param location Location to teleport to
      * @param cause Reason for teleport
      */
-    public static void smoothTeleport(Player player, Location location, PlayerTeleportEvent.TeleportCause cause){
+    public void smoothTeleport(Player player, Location location, PlayerTeleportEvent.TeleportCause cause){
         
         if(serverType == ServerType.CRAFT_BUKKIT){
             player.teleport(location);
@@ -93,10 +89,10 @@ public final class ChiyogamiLib{
                             player.teleport(finalLocation, cause);
                             chunks.forEach(chunk -> chunk.setForceLoaded(false));
                         }
-                    }.runTask();
+                    }.runTask(plugin);
                 });
             }
-        }.runTask();
+        }.runTask(plugin);
     }
     
     /**
@@ -105,7 +101,7 @@ public final class ChiyogamiLib{
      * @param location Location to teleport to
      * @param delay tick delay
      */
-    public static void smoothTeleport(Player player, Location location, long delay){
+    public void smoothTeleport(Player player, Location location, long delay){
         smoothTeleport(player, location, delay, PlayerTeleportEvent.TeleportCause.PLUGIN);
     }
     
@@ -116,7 +112,7 @@ public final class ChiyogamiLib{
      * @param delay tick delay
      * @param cause Reason for teleport
      */
-    public static void smoothTeleport(Player player, Location location, long delay, PlayerTeleportEvent.TeleportCause cause){
+    public void smoothTeleport(Player player, Location location, long delay, PlayerTeleportEvent.TeleportCause cause){
     
         if(serverType == ServerType.CRAFT_BUKKIT){
             player.teleport(location);
@@ -149,8 +145,8 @@ public final class ChiyogamiLib{
                         teleported[0] = true;
                         chunks.forEach(chunk -> chunk.setForceLoaded(false));
                     }
-                }.runTaskLater(delay);
+                }.runTaskLater(plugin, delay);
             }
-        }.runTask();
+        }.runTask(plugin);
     }
 }
