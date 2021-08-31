@@ -23,7 +23,9 @@ public abstract class WorldThreadRunnable implements Runnable{
     
     private static final Map<Long, Set<WorldThreadRunnable>> delayMap = new ConcurrentHashMap<>();
     
-    public static void worldThreadHeartBeat(World world){
+    public static void worldThreadHeartBeat(World world, int tick){
+        currentTick = tick;
+        
         Set<WorldThreadRunnable> delayRunnableSet = delayMap.get(currentTick);
         if(delayRunnableSet != null){
             delayRunnableSet.forEach(WorldThreadRunnable::registerRunnable);
@@ -51,8 +53,6 @@ public abstract class WorldThreadRunnable implements Runnable{
                 }
             });
         }
-        
-        currentTick++;
     }
     
     private static void registerRunnable(WorldThreadRunnable worldThreadRunnable){
