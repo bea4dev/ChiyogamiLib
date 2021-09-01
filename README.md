@@ -27,6 +27,8 @@ Example
 ------
 
 ```java
+import org.bukkit.Bukkit;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import world.chiyogami.chiyogamilib.ChiyogamiLib;
 
@@ -44,6 +46,10 @@ public class TestPlugin extends JavaPlugin {
         
         //Store plugin instance.
         plugin = this;
+        
+        //Register test event listener.
+        PluginManager pluginManager = Bukkit.getPluginManager();
+        pluginManager.registerEvents(new TestListener(), this);
     }
     
     public static ChiyogamiLib getChiyogamiLib() {
@@ -64,7 +70,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import world.chiyogami.chiyogamilib.scheduler.WorldThreadRunnable;
 import java.util.concurrent.CompletableFuture;
 
-public class EventListener implements Listener {
+public class TestListener implements Listener {
     
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
