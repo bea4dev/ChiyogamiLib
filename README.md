@@ -20,6 +20,7 @@ maven
     <groupId>com.github.Be4rJP</groupId>
     <artifactId>ChiyogamiLib</artifactId>
     <version>2dc09b1fc3</version>
+    <scope>compile</scope>
 </dependency>
 ```
 
