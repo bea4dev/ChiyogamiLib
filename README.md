@@ -2,8 +2,6 @@ ChiyogamiLib
 ===========
 API for [Chiyogami](https://github.com/Be4rJP/Chiyogami)
 
-Currently, it is only available in version 1.15.2 and 1.16.5.
-
 maven
 ------
 ```xml
