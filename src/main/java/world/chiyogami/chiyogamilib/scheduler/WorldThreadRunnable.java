@@ -73,7 +73,7 @@ public abstract class WorldThreadRunnable implements Runnable{
     
     
     
-    private final World world;
+    private World world;
     private boolean isCancelled = false;
     private long tick = -1;
     private int taskID = -1;
@@ -134,6 +134,8 @@ public abstract class WorldThreadRunnable implements Runnable{
     
     
     public World getWorld() {return world;}
+    
+    public void setWorld(World world) {this.world = world;}
     
     public synchronized void cancel(){
         isCancelled = true;
