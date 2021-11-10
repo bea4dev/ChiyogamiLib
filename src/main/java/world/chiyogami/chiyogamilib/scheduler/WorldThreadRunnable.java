@@ -105,6 +105,7 @@ public abstract class WorldThreadRunnable implements Runnable{
                 @Override
                 public void run() {
                     WorldThreadRunnable.this.run();
+                    if(WorldThreadRunnable.this.isCancelled) cancel();
                 }
             }.runTaskLater(plugin, delay);
             return;
@@ -121,6 +122,7 @@ public abstract class WorldThreadRunnable implements Runnable{
                 @Override
                 public void run() {
                     WorldThreadRunnable.this.run();
+                    if(WorldThreadRunnable.this.isCancelled) cancel();
                 }
             }.runTaskTimer(plugin, delay, period);
             return;
