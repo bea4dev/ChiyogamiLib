@@ -77,7 +77,7 @@ public class TestListener implements Listener {
         
         //The WorldThreadRunnable can be scheduled in the same way as the BukkitRunnable.
         //And it can be run in a different thread for each world.
-        WorldThreadRunnable worldThreadRunnable = new WorldThreadRunnable(player.getWorld()) {
+        new WorldThreadRunnable(player.getWorld()) {
             @Override
             public void run() {
                 //Teleport destination
