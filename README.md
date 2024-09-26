@@ -1,6 +1,6 @@
 ChiyogamiLib
 ===========
-API for [Chiyogami](https://github.com/Be4rJP/Chiyogami)
+API for [Chiyogami](https://github.com/bea4dev/Chiyogami)
 
 maven
 ------
@@ -15,9 +15,9 @@ maven
 
 ```xml
 <dependency>
-    <groupId>com.github.Be4rJP</groupId>
+    <groupId>com.github.bea4dev</groupId>
     <artifactId>ChiyogamiLib</artifactId>
-    <version>f5e45239d5</version>
+    <version>7ed1df4960</version>
     <scope>compile</scope>
 </dependency>
 ```
