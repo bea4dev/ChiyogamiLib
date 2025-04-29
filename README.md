@@ -17,48 +17,9 @@ maven
 <dependency>
     <groupId>com.github.bea4dev</groupId>
     <artifactId>ChiyogamiLib</artifactId>
-    <version>7ed1df4960</version>
+    <version>793983cef1</version>
     <scope>compile</scope>
 </dependency>
-```
-
-Example
-------
-
-```java
-import org.bukkit.Bukkit;
-import org.bukkit.plugin.PluginManager;
-import org.bukkit.plugin.java.JavaPlugin;
-import world.chiyogami.chiyogamilib.ChiyogamiLib;
-
-public class TestPlugin extends JavaPlugin {
-    
-    //ChiyogamiLib instance.
-    private static ChiyogamiLib chiyogamiLib;
-    //Plugin instance.
-    private static TestPlugin plugin;
-    
-    @Override
-    public void onEnable() {
-        //Create instance on startup.
-        chiyogamiLib = new ChiyogamiLib(this);
-        
-        //Store plugin instance.
-        plugin = this;
-        
-        //Register test event listener.
-        PluginManager pluginManager = Bukkit.getPluginManager();
-        pluginManager.registerEvents(new TestListener(), this);
-    }
-    
-    public static ChiyogamiLib getChiyogamiLib() {
-        return chiyogamiLib;
-    }
-    
-    public static TestPlugin getPlugin() {
-        return plugin;
-    }
-}
 ```
 
 ```java
@@ -80,14 +41,8 @@ public class TestListener implements Listener {
         new WorldThreadRunnable(player.getWorld()) {
             @Override
             public void run() {
-                //Teleport destination
                 Location location = player.getLocation().add(1000, 0, 0);
-                
-                //Load or generate the chunks around the destination first for smooth teleportation.
-                CompletableFuture<Void> future = TestPlugin.getChiyogamiLib.smoothTeleport(player, location);
-                future.thenAccept(v -> {
-                    player.sendMessage("Teleportation completed!");
-                });
+                player.teleport(location);
             }
         }.runTask(TestPlugin.getPlugin());
     }
